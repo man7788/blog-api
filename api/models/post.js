@@ -7,8 +7,8 @@ const PostSchema = new Schema({
   title: { type: String, required: true, minLength: 1, maxLength: 1000 },
   content: { type: String, required: true, minLength: 1, maxLength: 10000 },
   date: { type: Date, default: Date.now },
-  author: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  publish: { type: Boolean, required: true, default: "false" },
+  // author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  // publish: { type: Boolean, required: true },
 });
 
 // // Virtual for message's URL

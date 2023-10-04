@@ -6,7 +6,8 @@ const Schema = mongoose.Schema;
 const CommentSchema = new Schema({
   comment: { type: String, required: true, minLength: 1, maxLength: 5000 },
   date: { type: Date, default: Date.now },
-  author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  author: { type: String, required: true, minLength: 1, maxLength: 50 },
+  post: { type: Schema.Types.ObjectId, ref: "Post", required: true },
 });
 
 // // Virtual for message's URL
