@@ -9,10 +9,14 @@ exports.posts = asyncHandler(async (req, res, next) => {
   res.json(posts);
 });
 
-// Get all published posts on GET
+// Get a specific post and comments on GET
 exports.post_detail = asyncHandler(async (req, res, next) => {
-  const post = await Post.findById(req.params.id);
-  res.json(post);
+  const [post, comments] = await Promise.all([
+    Post.findById(req.params.id).populate("author", "username"),
+    Comment.find({ post: req.params.id }),
+  ]);
+  const response = { post, comments };
+  res.json(response);
 });
 
 // Handle post create on POST.
