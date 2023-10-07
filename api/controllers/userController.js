@@ -2,6 +2,7 @@ const { body, validationResult } = require("express-validator");
 const User = require("../models/user");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // // Testing purpose not open to public
 // exports.user_sign_up = asyncHandler(async (req, res, next) => {
@@ -95,7 +96,11 @@ exports.login_b = [
       if (!match) {
         throw new Error("Incorrect Password.");
       }
-      res.json(user);
+      jwt.sign({ user }, "secretkey", (err, token) => {
+        res.json({
+          token,
+        });
+      });
     }
   }),
 ];
