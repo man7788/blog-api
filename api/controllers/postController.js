@@ -2,6 +2,7 @@ const { body, validationResult } = require("express-validator");
 const Post = require("../models/post");
 const Comment = require("../models/comments");
 const asyncHandler = require("express-async-handler");
+const jwt = require("jsonwebtoken");
 
 // Get all published posts on GET
 exports.posts = asyncHandler(async (req, res, next) => {
@@ -103,3 +104,13 @@ exports.create_comment = [
     }
   }),
 ];
+
+// Handle post update on POST.
+// Handle post delete on POST.
+// Handle post publication details on GET.
+exports.posts_status = asyncHandler(async (req, res, next) => {
+  const posts = await Post.find();
+  res.json(posts);
+});
+// Handle comment update on POST.
+// Handle comment delete on POST.
