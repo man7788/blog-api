@@ -1,19 +1,9 @@
 const { body, validationResult } = require("express-validator");
 const User = require("../models/user");
+const Post = require("../models/post");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
-// // Testing purpose not open to public
-// exports.user_sign_up = asyncHandler(async (req, res, next) => {
-//   const user = new User({
-//     username: req.body.username,
-//     password: req.body.password,
-//   });
-
-//   await user.save();
-//   res.json(user);
-// });
 
 // Sign-up using encrypted password
 exports.sign_up_b = [
@@ -104,3 +94,83 @@ exports.login_b = [
     }
   }),
 ];
+
+// Handle post create on POST.
+exports.create_post = [
+  // Validate and sanitize fields.
+  body("title", "Title must not be empty.")
+    .trim()
+    .isLength({ min: 1, max: 1000 })
+    .escape(),
+  body("content", "Content must not be empty.")
+    .trim()
+    .isLength({ min: 1, max: 10000 })
+    .escape(),
+  body("date", "Invalid Date.").toDate(),
+  body("author", "Author must not be empty.")
+    .optional()
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("publish", "Publish must not be empty.").trim().isBoolean().escape(),
+
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a Post object with escaped and trimmed data.
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      author: req.body.author,
+      publish: req.body.publish,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+      res.json({
+        post,
+        errors: errors.array(),
+      });
+    } else {
+      // Data from form is valid. Save Post.
+      await post.save();
+      res.json(post);
+    }
+  }),
+];
+
+// Handle post update on POST.
+// Handle post delete on POST.
+exports.post_delete = asyncHandler(async (req, res, next) => {
+  const posts = await Post.find();
+
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        posts,
+      });
+    }
+  });
+});
+
+// Handle post publication details on GET.
+exports.posts_status = asyncHandler(async (req, res, next) => {
+  const posts = await Post.find();
+
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        posts,
+      });
+    }
+  });
+});
+
+// Handle comment update on POST.
+// Handle comment delete on POST.
