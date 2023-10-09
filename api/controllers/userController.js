@@ -204,7 +204,59 @@ exports.post_delete = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Handle post update on POST.
+// Handle post edit on POST.
+exports.post_edit = [
+  // Validate and sanitize fields.
+  body("title", "Title must not be empty.")
+    .trim()
+    .isLength({ min: 1, max: 1000 })
+    .escape(),
+  body("content", "Content must not be empty.")
+    .trim()
+    .isLength({ min: 1, max: 10000 })
+    .escape(),
+  body("date", "Invalid Date.").toDate(),
+  body("author", "Author must not be empty.")
+    .optional()
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("publish", "Publish must not be empty.").trim().isBoolean().escape(),
+
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a Post object with escaped and trimmed data.
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      author: req.body.author,
+      publish: req.body.publish,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+      res.json({
+        post,
+        errors: errors.array(),
+      });
+    } else {
+      // Data from form is valid. Save Post.
+      jwt.verify(req.token, "secretkey", async (err, authData) => {
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          await Post.findByIdAndUpdate(req.params.id, post, {});
+          res.json({
+            post,
+          });
+        }
+      });
+    }
+  }),
+];
 
 // Handle comment update on POST.
 // Handle comment delete on POST.

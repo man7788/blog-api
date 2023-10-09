@@ -19,6 +19,9 @@ router.post("/posts/create", verifyToken, userController.post_create);
 // Delete a specific post and comments for edit page (Protected)
 router.post("/posts/:id/delete", verifyToken, userController.post_delete);
 
+// Edit a specific post (Protected)
+router.post("/posts/:id/edit", verifyToken, userController.post_edit);
+
 // Get a specific post and comments for edit page (Protected)
 router.get("/posts/:id", verifyToken, userController.post_detail);
 
