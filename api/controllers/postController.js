@@ -110,7 +110,17 @@ exports.create_comment = [
 // Handle post publication details on GET.
 exports.posts_status = asyncHandler(async (req, res, next) => {
   const posts = await Post.find();
-  res.json(posts);
+
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        posts,
+      });
+    }
+  });
 });
+
 // Handle comment update on POST.
 // Handle comment delete on POST.

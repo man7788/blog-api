@@ -7,10 +7,10 @@ const postController = require("../controllers/postController");
 // Get all published posts
 router.get("/", postController.posts);
 
-// Update publication status or blog posts
+// Get publication status of all blog posts (Protected)
 router.get("/publish", verifyToken, postController.posts_status);
 
-// Create new blog post
+// Create new blog post (Protected)
 router.post("/create", postController.create_post);
 
 // Get a specific post
