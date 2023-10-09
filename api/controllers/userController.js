@@ -1,11 +1,12 @@
 const { body, validationResult } = require("express-validator");
 const User = require("../models/user");
 const Post = require("../models/post");
+const Comment = require("../models/comments");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Sign-up using encrypted password
+// Handle sign-up using encrypted password on POST
 exports.sign_up_b = [
   body("nickname", "Nickname must not be empty.")
     .trim()
@@ -58,7 +59,7 @@ exports.sign_up_b = [
     }
   }),
 ];
-// Log-in using encrypted password
+// Handle log-in using encrypted password on POST
 exports.login_b = [
   body("username", "Username must not be empty.")
     .trim()
@@ -95,8 +96,43 @@ exports.login_b = [
   }),
 ];
 
+// Handle all post detail on GET.
+exports.posts = asyncHandler(async (req, res, next) => {
+  const posts = await Post.find();
+
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        posts,
+      });
+    }
+  });
+});
+
+// Handle edit a specific post and comments on GET
+exports.post_detail = asyncHandler(async (req, res, next) => {
+  const [post, comments] = await Promise.all([
+    Post.findById(req.params.id).populate({
+      path: "author",
+      model: "User",
+      select: "username",
+    }),
+    Comment.find({ post: req.params.id }),
+  ]);
+  const response = { post, comments };
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json(response);
+    }
+  });
+});
+
 // Handle post create on POST.
-exports.create_post = [
+exports.post_create = [
   // Validate and sanitize fields.
   body("title", "Title must not be empty.")
     .trim()
@@ -135,42 +171,40 @@ exports.create_post = [
       });
     } else {
       // Data from form is valid. Save Post.
-      await post.save();
-      res.json(post);
+      jwt.verify(req.token, "secretkey", async (err, authData) => {
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          await post.save();
+          res.json({
+            post,
+          });
+        }
+      });
     }
   }),
 ];
 
-// Handle post update on POST.
 // Handle post delete on POST.
 exports.post_delete = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find();
+  const [post, comments] = await Promise.all([
+    Post.findById(req.params.id),
+    Comment.find({ post: req.params.id }),
+  ]);
+  const response = { post, comments };
 
-  jwt.verify(req.token, "secretkey", (err, authData) => {
+  jwt.verify(req.token, "secretkey", async (err, authData) => {
     if (err) {
       res.sendStatus(403);
     } else {
-      res.json({
-        posts,
-      });
+      await Post.findByIdAndRemove(req.params.id);
+      await Comment.deleteMany({ post: req.params.id });
+      res.json(response);
     }
   });
 });
 
-// Handle post publication details on GET.
-exports.posts_status = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find();
-
-  jwt.verify(req.token, "secretkey", (err, authData) => {
-    if (err) {
-      res.sendStatus(403);
-    } else {
-      res.json({
-        posts,
-      });
-    }
-  });
-});
+// Handle post update on POST.
 
 // Handle comment update on POST.
 // Handle comment delete on POST.
