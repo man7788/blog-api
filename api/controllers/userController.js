@@ -97,7 +97,7 @@ exports.login_b = [
   }),
 ];
 
-// Display all post detail on GET.
+// Display all post on GET.
 exports.posts = asyncHandler(async (req, res, next) => {
   const posts = await Post.find();
 
@@ -258,6 +258,21 @@ exports.post_edit = [
     }
   }),
 ];
+
+// Display to edit a specific comment on GET
+exports.comment_detail = asyncHandler(async (req, res, next) => {
+  const comment = await Comment.findById(req.params.commentId);
+
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        comment,
+      });
+    }
+  });
+});
 
 // Handle comment delete on POST.
 exports.comment_delete = asyncHandler(async (req, res, next) => {

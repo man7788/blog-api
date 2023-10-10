@@ -19,7 +19,7 @@ router.post("/posts/create", verifyToken, userController.post_create);
 // POST request to delete a specific post and comments for edit page (Protected)
 router.post("/posts/:postId/delete", verifyToken, userController.post_delete);
 
-// POST request edit a specific post (Protected)
+// POST request to edit a specific post (Protected)
 router.post("/posts/:postId/edit", verifyToken, userController.post_edit);
 
 // GET request to display a specific post and comments for edit page (Protected)
@@ -38,5 +38,8 @@ router.post(
   verifyToken,
   userController.comment_edit
 );
+
+// GET request to display a specific comment for edit page (Protected)
+router.get("/comments/:commentId/", verifyToken, userController.comment_detail);
 
 module.exports = router;
