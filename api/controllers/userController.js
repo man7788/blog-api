@@ -59,6 +59,7 @@ exports.sign_up_b = [
     }
   }),
 ];
+
 // Handle log-in using encrypted password on POST
 exports.login_b = [
   body("username", "Username must not be empty.")
@@ -96,7 +97,7 @@ exports.login_b = [
   }),
 ];
 
-// Handle all post detail on GET.
+// Display all post detail on GET.
 exports.posts = asyncHandler(async (req, res, next) => {
   const posts = await Post.find();
 
@@ -111,15 +112,15 @@ exports.posts = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Handle edit a specific post and comments on GET
+// Display edit a specific post and comments on GET
 exports.post_detail = asyncHandler(async (req, res, next) => {
   const [post, comments] = await Promise.all([
-    Post.findById(req.params.id).populate({
+    Post.findById(req.params.postId).populate({
       path: "author",
       model: "User",
       select: "username",
     }),
-    Comment.find({ post: req.params.id }),
+    Comment.find({ post: req.params.postId }),
   ]);
   const response = { post, comments };
   jwt.verify(req.token, "secretkey", (err, authData) => {
@@ -188,8 +189,8 @@ exports.post_create = [
 // Handle post delete on POST.
 exports.post_delete = asyncHandler(async (req, res, next) => {
   const [post, comments] = await Promise.all([
-    Post.findById(req.params.id),
-    Comment.find({ post: req.params.id }),
+    Post.findById(req.params.postId),
+    Comment.find({ post: req.params.postId }),
   ]);
   const response = { post, comments };
 
@@ -197,8 +198,8 @@ exports.post_delete = asyncHandler(async (req, res, next) => {
     if (err) {
       res.sendStatus(403);
     } else {
-      await Post.findByIdAndRemove(req.params.id);
-      await Comment.deleteMany({ post: req.params.id });
+      await Post.findByIdAndRemove(req.params.postId);
+      await Comment.deleteMany({ post: req.params.postId });
       res.json(response);
     }
   });
@@ -233,7 +234,7 @@ exports.post_edit = [
       content: req.body.content,
       author: req.body.author,
       publish: req.body.publish,
-      _id: req.params.id,
+      _id: req.params.postId,
     });
 
     if (!errors.isEmpty()) {
@@ -248,7 +249,7 @@ exports.post_edit = [
         if (err) {
           res.sendStatus(403);
         } else {
-          await Post.findByIdAndUpdate(req.params.id, post, {});
+          await Post.findByIdAndUpdate(req.params.postId, post, {});
           res.json({
             post,
           });
@@ -260,3 +261,15 @@ exports.post_edit = [
 
 // Handle comment update on POST.
 // Handle comment delete on POST.
+exports.comment_delete = asyncHandler(async (req, res, next) => {
+  const comment = await Comment.findById(req.params.commentId);
+
+  jwt.verify(req.token, "secretkey", async (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      await Comment.findByIdAndRemove(req.params.commentId);
+      res.json(comment);
+    }
+  });
+});
