@@ -10,6 +10,6 @@ router.get("/", postController.posts);
 router.get("/:postId", postController.post_detail);
 
 // Create new comment for a blog post
-router.post("/:postId/comment", postController.create_comment);
+router.post("/:postId/comment/create", postController.create_comment);
 
 module.exports = router;
