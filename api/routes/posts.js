@@ -7,9 +7,9 @@ const postController = require("../controllers/postController");
 router.get("/", postController.posts);
 
 // Get a specific post
-router.get("/:id", postController.post_detail);
+router.get("/:postId", postController.post_detail);
 
 // Create new comment for a blog post
-router.post("/:id/comment", postController.create_comment);
+router.post("/:postId/comment", postController.create_comment);
 
 module.exports = router;

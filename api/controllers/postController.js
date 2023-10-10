@@ -17,12 +17,12 @@ exports.posts = asyncHandler(async (req, res, next) => {
 // Handle a specific post and comments on GET
 exports.post_detail = asyncHandler(async (req, res, next) => {
   const [post, comments] = await Promise.all([
-    Post.findById(req.params.id).populate({
+    Post.findById(req.params.postId).populate({
       path: "author",
       model: "User",
       select: "username",
     }),
-    Comment.find({ post: req.params.id }),
+    Comment.find({ post: req.params.postId }),
   ]);
   const response = { post, comments };
   res.json(response);
@@ -52,7 +52,7 @@ exports.create_comment = [
       comment: req.body.comment,
       date: new Date(),
       author: req.body.author,
-      post: req.params.id,
+      post: req.params.postId,
     });
 
     if (!errors.isEmpty()) {
