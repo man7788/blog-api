@@ -32,4 +32,11 @@ router.post(
   userController.comment_delete
 );
 
+// POST request to edit a specific comment (Protected)
+router.post(
+  "/comments/:commentId/edit",
+  verifyToken,
+  userController.comment_edit
+);
+
 module.exports = router;

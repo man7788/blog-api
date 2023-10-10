@@ -259,7 +259,6 @@ exports.post_edit = [
   }),
 ];
 
-// Handle comment update on POST.
 // Handle comment delete on POST.
 exports.comment_delete = asyncHandler(async (req, res, next) => {
   const comment = await Comment.findById(req.params.commentId);
@@ -273,3 +272,52 @@ exports.comment_delete = asyncHandler(async (req, res, next) => {
     }
   });
 });
+
+// Handle comment edit on POST.
+exports.comment_edit = [
+  body("comment", "Comment must not be empty.")
+    .trim()
+    .isLength({ min: 1, max: 5000 })
+    .escape(),
+  body("date", "Invalid Date.").toDate(),
+  body("author", "Author must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("post", "Post must not be empty.")
+    .optional()
+    .isLength({ min: 1 })
+    .trim()
+    .escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    const originalComment = await Comment.findById(req.params.commentId);
+
+    const comment = new Comment({
+      comment: req.body.comment,
+      date: new Date(),
+      author: req.body.author,
+      post: originalComment.post,
+      _id: req.params.commentId,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+      res.json({
+        comment,
+        errors: errors.array(),
+      });
+    } else {
+      jwt.verify(req.token, "secretkey", async (err, authData) => {
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          await Comment.findByIdAndUpdate(req.params.commentId, comment, {});
+          res.json(comment);
+        }
+      });
+    }
+  }),
+];
