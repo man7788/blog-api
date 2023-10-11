@@ -11,7 +11,7 @@ const Router = () => {
       errorElement: <ErrorPage />,
     },
     {
-      path: "post/:postId",
+      path: "posts/:postId",
       element: <Post />,
     },
   ]);
