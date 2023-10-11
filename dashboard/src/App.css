@@ -1,0 +1,19 @@
+body {
+  background: rgb(30, 30, 30);
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 0;
+  color: whitesmoke;
+}
+
+a:link {
+  color: deepskyblue;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: pink;
+  background-color: transparent;
+  text-decoration: none;
+}
