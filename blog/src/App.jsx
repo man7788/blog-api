@@ -2,7 +2,7 @@
 // eslint-disable-next-line react/prop-types
 import "./App.css";
 import Card from "./components/Card";
-import { posts, post } from "./testData";
+import { posts, post } from "../../testData";
 
 // console.log(posts);
 // console.log(post);

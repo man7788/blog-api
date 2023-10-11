@@ -1,6 +1,6 @@
 import Comment from "./Comment";
 import { Link, useParams } from "react-router-dom";
-import { posts, post } from "../testData";
+import { posts, post } from "../../../testData";
 
 const { comments } = post;
 const query = (id) => {
