@@ -3,12 +3,15 @@ const { DateTime } = require("luxon");
 
 const Schema = mongoose.Schema;
 
-const CommentSchema = new Schema({
-  comment: { type: String, required: true, minLength: 1, maxLength: 5000 },
-  date: { type: Date, default: Date.now },
-  author: { type: String, required: true, minLength: 1, maxLength: 50 },
-  post: { type: Schema.Types.ObjectId, ref: "Post", required: true },
-});
+const CommentSchema = new Schema(
+  {
+    comment: { type: String, required: true, minLength: 1, maxLength: 5000 },
+    date: { type: Date, default: Date.now },
+    author: { type: String, required: true, minLength: 1, maxLength: 50 },
+    post: { type: Schema.Types.ObjectId, ref: "Post", required: true },
+  },
+  { toJSON: { virtuals: true } }
+);
 
 // // Virtual for message's URL
 // MessageSchema.virtual("url").get(function () {

@@ -3,20 +3,23 @@ const { DateTime } = require("luxon");
 
 const Schema = mongoose.Schema;
 
-const PostSchema = new Schema({
-  title: { type: String, required: true, minLength: 1, maxLength: 1000 },
-  content: { type: String, required: true, minLength: 1, maxLength: 10000 },
-  date: { type: Date, default: Date.now },
-  author: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const PostSchema = new Schema(
+  {
+    title: { type: String, required: true, minLength: 1, maxLength: 1000 },
+    content: { type: String, required: true, minLength: 1, maxLength: 10000 },
+    date: { type: Date, default: Date.now },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    publish: { type: Boolean, required: true },
   },
-  publish: { type: Boolean, required: true },
-});
+  { toJSON: { virtuals: true } }
+);
 
 PostSchema.virtual("url").get(function () {
-  return `/post/${this._id}`;
+  return `/posts/${this._id}`;
 });
 
 PostSchema.pre("validate", function (next) {
