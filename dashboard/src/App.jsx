@@ -1,21 +1,43 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import testData from '../../testData.jsx';
 
-const user = { username: 'asd', password: 'asd' };
-const encrypt = 'huehuehue';
+// localStorage.setItem('overview', JSON.stringify(testData.overview));
+// localStorage.setItem('posts', JSON.stringify(testData.posts));
+// localStorage.setItem('user', JSON.stringify(testData.user));
+// localStorage.setItem('token', JSON.stringify(testData.token));
+// localStorage.setItem('diu', JSON.stringify('on99'));
+// localStorage.removeItem('secretKey');
+// localStorage.clear();
 
 const App = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [token, setToken] = useState('');
+  const [login, setLogin] = useState(false);
   const [error, setError] = useState('');
+
+  // Delete after API implementation
+  const [user, setUser] = useState('');
+
+  // Delete after API implementation
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('user'));
+    userData && setUser(userData);
+  }, []);
 
   const onSubmitForm = (e) => {
     e.preventDefault();
 
+    // const token = <API call with form data here>
+    // if (token) {
+    // localStorage.setItem('token', JSON.stringify(token));
+    // setLogin(true);
+    // }
     if (username === user.username && password === user.password) {
-      setToken(encrypt);
+      // localStorage.setItem('token', JSON.stringify(token));
+      setLogin(true);
+      console.log('login');
     } else {
       setError('Wrong username or password.');
     }
@@ -42,8 +64,8 @@ const App = () => {
         <button type="submit">Submit</button>
       </form>
       {error.length > 0 && error}
-      {token.length > 0 && (
-        <Navigate to="dashboard" replace={true} state={token} />
+      {login === true && (
+        <Navigate to="dashboard" replace={true} state={{ login }} />
       )}
     </>
   );

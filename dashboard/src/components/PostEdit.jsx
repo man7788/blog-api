@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const PostEdit = () => {
+  // state={login, post} redirect from Post.jsx
   const { state } = useLocation();
   const { title, content, author, publish, url } = state.post;
 
@@ -56,7 +57,7 @@ const PostEdit = () => {
         </select>
         <button type="submit">Submit</button>
       </form>
-      <Link to={'/user' + url} state={state.token}>
+      <Link to={'/user' + url} state={{ login: state.login }}>
         Cancel
       </Link>
     </>

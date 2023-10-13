@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import Card from './Card';
-import { posts } from '../../../testData.jsx';
-
-const encrypt = 'huehuehue';
 
 const Dashboard = () => {
   const [auth, setAuth] = useState(false);
+  const [posts, setPosts] = useState();
+  // state={login} redirect from App.jsx
   const { state } = useLocation();
 
   useEffect(() => {
-    state === encrypt && setAuth(true);
-  });
+    if (state && state.login === true) {
+      setAuth(true);
+      // const checkToken = JSON.parse(localStorage.getItem('token'));
+      // const postData = <API call with token header>
+      const postData = JSON.parse(localStorage.getItem('overview'));
+      if (postData) {
+        setPosts(postData);
+      }
+    }
+  }, []);
 
   return (
     <>
@@ -19,9 +26,11 @@ const Dashboard = () => {
         <>
           <h1>Dashboard</h1>
           <p>Welcome back!</p>
-          {posts.map((post) => (
-            <Card key={post._id} {...post} state={state} />
-          ))}
+          {posts ? (
+            posts.map((post) => <Card key={post._id} {...post} state={state} />)
+          ) : (
+            <p>No post to show</p>
+          )}
         </>
       ) : (
         <div>
