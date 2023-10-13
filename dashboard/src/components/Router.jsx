@@ -3,6 +3,8 @@ import App from '../App';
 import Post from './Post';
 import ErrorPage from './ErrorPage';
 import Dashboard from './Dashboard';
+import PostEdit from './PostEdit';
+import PostDelete from './PostDelete';
 
 const Router = () => {
   const router = createBrowserRouter([
@@ -12,14 +14,24 @@ const Router = () => {
       errorElement: <ErrorPage message={'Page Not Found'} />,
     },
     {
+      path: 'user/posts/:postId/edit',
+      element: <PostEdit />,
+      errorElement: <ErrorPage message={'Error'} />,
+    },
+    {
+      path: 'user/posts/:postId/delete',
+      element: <PostDelete />,
+      errorElement: <ErrorPage message={'Error'} />,
+    },
+    {
       path: 'user/posts/:postId',
       element: <Post />,
-      errorElement: <ErrorPage message={'Forbidden'} />,
+      errorElement: <ErrorPage message={'Error'} />,
     },
     {
       path: 'dashboard',
       element: <Dashboard />,
-      errorElement: <ErrorPage message={'Forbidden'} />,
+      errorElement: <ErrorPage message={'Error'} />,
     },
   ]);
 
