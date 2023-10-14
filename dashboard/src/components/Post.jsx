@@ -48,7 +48,7 @@ const Post = () => {
           <button onClick={() => setDeletePost(true)}>Delete</button>
           <h3>Comment</h3>
           {comments.map((comment) => (
-            <Comment key={comment._id} {...comment} />
+            <Comment key={comment._id} {...comment} login={state.login} />
           ))}
           <Link to="/dashboard" state={state}>
             Back to dashboard
