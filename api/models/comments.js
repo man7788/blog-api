@@ -13,11 +13,9 @@ const CommentSchema = new Schema(
   { toJSON: { virtuals: true } }
 );
 
-// // Virtual for message's URL
-// MessageSchema.virtual("url").get(function () {
-//   // We don't use an arrow function as we'll need the this object
-//   return `/catalog/book/${this._id}`;
-// });
+CommentSchema.virtual("url").get(function () {
+  return `/comment/${this._id}`;
+});
 
 CommentSchema.virtual("date_formatted").get(function () {
   return this.date
