@@ -45,15 +45,12 @@ const PostEdit = () => {
           value={editAuthor}
           onChange={(event) => setEditAuthor(event.target.value)}></input>
         <label htmlFor="publish">Publish:</label>
-        <select name="publish" id="publish">
-          <option value="true" selected={publish === true ? 'selected' : false}>
-            Yes
-          </option>
-          <option
-            value="false"
-            selected={publish === false ? 'selected' : false}>
-            No
-          </option>
+        <select
+          defaultValue={publish === true ? true : false}
+          name="publish"
+          id="publish">
+          <option value="true">Yes</option>
+          <option value="false">No</option>
         </select>
         <button type="submit">Submit</button>
       </form>
