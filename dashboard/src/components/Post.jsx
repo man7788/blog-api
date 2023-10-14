@@ -26,7 +26,6 @@ const Post = () => {
       const postData = JSON.parse(localStorage.getItem('posts'));
       if (postData) {
         const postDetail = query(postId, postData);
-        // console.log(postDetail);
         setPost(postDetail.post);
         setComments(postDetail.comments);
       }
@@ -62,13 +61,13 @@ const Post = () => {
       )}
       {editPost && (
         <Navigate
-          to={'/user' + post.url + '/edit'}
-          state={{ login: state.login, post }}
+          to={'/user/posts/' + post._id + '/edit'}
+          state={{ login: state.login, post, comments }}
         />
       )}
       {deletePost && (
         <Navigate
-          to={'/user' + post.url + '/delete'}
+          to={'/user/posts/' + post._id + '/delete'}
           state={{ login: state.login, post }}
         />
       )}
