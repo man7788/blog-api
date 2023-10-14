@@ -14,7 +14,7 @@ const PostDelete = () => {
 
   return (
     <>
-      <h3>Are you sure want to delete {state.post.title}</h3>
+      <h3>Are you sure want to delete {state.post.title}?</h3>
       <button onClick={() => setCancel(true)}>Cancel</button>{' '}
       <button onClick={onDeletePost}>Delete</button>
       {cancel && (
