@@ -5,6 +5,8 @@ import ErrorPage from './ErrorPage';
 import Dashboard from './Dashboard';
 import PostEdit from './PostEdit';
 import PostDelete from './PostDelete';
+import CommentEdit from './CommentEdit';
+import CommentDelete from './CommentDelete';
 
 const Router = () => {
   const router = createBrowserRouter([
@@ -12,6 +14,16 @@ const Router = () => {
       path: '/',
       element: <App />,
       errorElement: <ErrorPage message={'Page Not Found'} />,
+    },
+    {
+      path: 'user/comment/:commentId/edit',
+      element: <CommentEdit />,
+      errorElement: <ErrorPage message={'Error'} />,
+    },
+    {
+      path: 'user/comment/:commentId/delete',
+      element: <CommentDelete />,
+      errorElement: <ErrorPage message={'Error'} />,
     },
     {
       path: 'user/posts/:postId/edit',

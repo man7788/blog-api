@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
-const Comment = ({ comment, author, date_formatted, post, login }) => {
+const Comment = ({ url, comment, author, date_formatted, post, login }) => {
   const [editComment, setEditComment] = useState(false);
   const [deleteComment, setDeleteComment] = useState(false);
 
@@ -14,7 +14,7 @@ const Comment = ({ comment, author, date_formatted, post, login }) => {
       <button onClick={() => setDeleteComment(true)}>Delete</button>
       {editComment && (
         <Navigate
-          to={'/user/posts/' + post + '/comment/edit'}
+          to={'/user' + url + '/edit'}
           state={{
             login,
             post,
@@ -24,10 +24,9 @@ const Comment = ({ comment, author, date_formatted, post, login }) => {
       )}
       {deleteComment && (
         <Navigate
-          to={'/user/posts/' + post + '/comment/delete'}
+          to={'/user' + url + '/delete'}
           state={{
             login,
-            post,
             comment,
           }}
         />
