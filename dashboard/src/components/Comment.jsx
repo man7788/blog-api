@@ -24,10 +24,7 @@ const Comment = ({ props }) => {
       {deleteComment && (
         <Navigate
           to={'/user' + url + '/delete'}
-          state={{
-            login,
-            comment,
-          }}
+          state={{ login, comment: props.comment }}
         />
       )}
     </div>
