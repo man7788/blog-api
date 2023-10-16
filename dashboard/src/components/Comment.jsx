@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-const Comment = ({ url, comment, author, date_formatted, post, login }) => {
+const Comment = ({ props }) => {
   const [editComment, setEditComment] = useState(false);
   const [deleteComment, setDeleteComment] = useState(false);
+
+  const { login } = props;
+  const { comment, author, date_formatted, url } = props.comment;
 
   return (
     <div style={{ border: '2px solid white' }}>
@@ -15,11 +18,7 @@ const Comment = ({ url, comment, author, date_formatted, post, login }) => {
       {editComment && (
         <Navigate
           to={'/user' + url + '/edit'}
-          state={{
-            login,
-            post,
-            comment,
-          }}
+          state={{ login, comment: props.comment }}
         />
       )}
       {deleteComment && (
