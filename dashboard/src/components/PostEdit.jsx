@@ -52,7 +52,7 @@ const PostEdit = () => {
     <>
       {auth ? (
         <div>
-          <h1>Edit</h1>
+          <h1>Edit Post</h1>
           <form
             action=""
             method="post"
