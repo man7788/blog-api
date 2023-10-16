@@ -1,11 +1,11 @@
 import Comment from "./Comment";
 import { Link, useParams } from "react-router-dom";
-import { posts, post } from "../../../testData";
 
-const { comments } = post;
+const posts = JSON.parse(localStorage.getItem("posts"));
+
 const query = (id) => {
   for (const post of posts) {
-    if (post._id === id) {
+    if (post.post._id === id) {
       return post;
     }
   }
@@ -14,8 +14,9 @@ const query = (id) => {
 const Post = () => {
   const { postId } = useParams();
   const post = query(postId);
-  const { title, content, author, date_formatted } = post;
+  const { comments } = post;
 
+  const { title, content, author, date_formatted } = post.post;
   return (
     <div>
       <h3>{title}</h3>

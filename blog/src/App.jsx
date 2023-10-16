@@ -1,19 +1,27 @@
-/* eslint-disable react/prop-types */
-// eslint-disable-next-line react/prop-types
 import "./App.css";
+import { useEffect } from "react";
 import Card from "./components/Card";
-import { posts, post } from "../../testData";
+import testData from "../../testData.jsx";
 
-// console.log(posts);
-// console.log(post);
+// localStorage.setItem("overview", JSON.stringify(testData.overview));
+// localStorage.setItem("posts", JSON.stringify(testData.posts));
+// localStorage.setItem("user", JSON.stringify(testData.user));
+// localStorage.setItem("token", JSON.stringify(testData.token));
+// localStorage.setItem('diu', JSON.stringify('on99'));
+// localStorage.removeItem('secretKey');
+// localStorage.clear();
 
 const App = () => {
+  const posts = JSON.parse(localStorage.getItem("overview"));
+
   return (
     <>
       <h1>Blog</h1>
-      {posts.map((post) => (
-        <Card key={post._id} {...post} />
-      ))}
+      {posts ? (
+        posts.map((post) => <Card key={post._id} {...post} />)
+      ) : (
+        <p>No post to show</p>
+      )}
     </>
   );
 };
