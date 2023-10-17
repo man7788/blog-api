@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, Navigate } from 'react-router-dom';
 import Card from './Card';
 
 const Dashboard = () => {
   const [auth, setAuth] = useState(false);
+  const [redirect, setRedirect] = useState(false);
   const [posts, setPosts] = useState();
   // state={login} redirect from App.jsx
   const { state } = useLocation();
@@ -20,6 +21,10 @@ const Dashboard = () => {
     }
   }, []);
 
+  const onNewPost = () => {
+    setRedirect(true);
+  };
+
   return (
     <>
       {auth ? (
@@ -31,6 +36,8 @@ const Dashboard = () => {
           ) : (
             <p>No post to show</p>
           )}
+          <button onClick={onNewPost}>New Post</button>
+          {redirect && <Navigate to={'/new-post/'} state={{ login: true }} />}
         </>
       ) : (
         <div>

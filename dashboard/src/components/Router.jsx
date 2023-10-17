@@ -7,6 +7,7 @@ import PostEdit from './PostEdit';
 import PostDelete from './PostDelete';
 import CommentEdit from './CommentEdit';
 import CommentDelete from './CommentDelete';
+import NewPost from './NewPost';
 
 const Router = () => {
   const router = createBrowserRouter([
@@ -43,6 +44,11 @@ const Router = () => {
     {
       path: 'dashboard',
       element: <Dashboard />,
+      errorElement: <ErrorPage message={'Error'} />,
+    },
+    {
+      path: 'new-post',
+      element: <NewPost />,
       errorElement: <ErrorPage message={'Error'} />,
     },
   ]);
