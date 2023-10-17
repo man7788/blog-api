@@ -6,12 +6,11 @@ const NewPost = () => {
   const [redirect, setRedirect] = useState(false);
   // state={login, post, comments} redirect from Post.jsx
   const { state } = useLocation();
-  // const { title, content, author, publish, _id } = state.post;
 
-  // const [editTitle, setEditTitle] = useState(title);
-  // const [editContent, setEditContent] = useState(content);
-  // const [editAuthor, setEditAuthor] = useState(author.username);
-  // const [editPublish, setEditPublish] = useState(publish);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [author, setAuthor] = useState('');
+  const [publish, setPublish] = useState(false);
 
   useEffect(() => {
     if (state && state.login === true) {
@@ -22,30 +21,13 @@ const NewPost = () => {
   const onSubmitForm = (e) => {
     e.preventDefault();
 
-    // const comments = state.comments.length > 0 ? state.comments : [];
-
-    // const updatedPost = {
-    //   post: {
-    //     title: editTitle,
-    //     content: editContent,
-    //     author: { username: editAuthor, _id: author._id },
-    //     publish: editPublish,
-    //     _id,
-    //   },
-    //   comments,
-    // };
-
     // const postData = JSON.parse(localStorage.getItem('posts'));
-    // const newPostData = postData.map((post) => {
-    //   if (post.post._id === _id) {
-    //     return updatedPost;
-    //   } else {
-    //     return post;
-    //   }
-    // });
-    // // console.log(newPostData);
-    // localStorage.setItem('posts', JSON.stringify(newPostData));
-    // setRedirect(true);
+
+    const newPost = { title, content, publish };
+    console.log(newPost);
+
+    // localStorage.setItem('posts', JSON.stringify(newPost));
+    setRedirect(true);
   };
 
   return (
@@ -53,7 +35,7 @@ const NewPost = () => {
       {auth ? (
         <div>
           <h1>New Post</h1>
-          {/* <form
+          <form
             action=""
             method="post"
             onSubmit={onSubmitForm}
@@ -63,35 +45,36 @@ const NewPost = () => {
               type="text"
               name="title"
               id="title"
-              value={editTitle}
-              onChange={(event) => setEditTitle(event.target.value)}></input>
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}></input>
             <label htmlFor="content">Content:</label>
             <input
               type="text"
               name="content"
               id="content"
-              value={editContent}
-              onChange={(event) => setEditContent(event.target.value)}></input>
+              value={content}
+              onChange={(event) => setContent(event.target.value)}></input>
             <label htmlFor="author">Author:</label>
             <input
               type="text"
               name="author"
               id="author"
-              value={editAuthor}
-              onChange={(event) => setEditAuthor(event.target.value)}></input>
+              value={author}
+              placeholder="Admin"
+              onChange={(event) => setAuthor(event.target.value)}></input>
             <label htmlFor="publish">Publish:</label>
             <select
               defaultValue={publish === true ? true : false}
               name="publish"
               id="publish"
               onChange={(event) =>
-                setEditPublish(event.target.value ? true : false)
+                setPublish(event.target.value ? true : false)
               }>
               <option value="true">Yes</option>
               <option value="false">No</option>
             </select>
             <button type="submit">Submit</button>
-          </form> */}
+          </form>
           <Link to={'/dashboard'} state={{ login: state.login }}>
             Cancel
           </Link>
