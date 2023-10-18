@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Comment from "./Comment";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, Navigate } from "react-router-dom";
 
 const Post = () => {
   const { postId } = useParams();
@@ -10,11 +10,14 @@ const Post = () => {
     content: "",
     author: "",
     date_formatted: "",
+    _id: "",
   });
   const [comments, setComments] = useState({ comment: [] });
   const [error, setError] = useState();
   const [loading, setLoading] = useState();
-  const { title, content, author, date_formatted } = post;
+  const { title, content, author, date_formatted, _id } = post;
+
+  const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
     fetch(`http://localhost:3000/posts/${postId}`, { mode: "cors" })
@@ -32,7 +35,9 @@ const Post = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const onNewComment = () => {};
+  const onNewComment = () => {
+    setRedirect(true);
+  };
 
   if (error) return <p>A network error was encountered</p>;
   if (loading) return <p>Loading...</p>;
@@ -50,6 +55,12 @@ const Post = () => {
         <p>No comment to show</p>
       )}
       <button onClick={onNewComment}>New Comment</button>
+      {redirect && (
+        <Navigate
+          to={"/posts/" + _id + "/comment/new"}
+          state={{ _id }}
+        ></Navigate>
+      )}
       <div>
         <Link to="/">Back to homepage</Link>
       </div>
