@@ -10,6 +10,8 @@ const indexRouter = require("./routes/index");
 const postRouter = require("./routes/posts");
 const userRouter = require("./routes/user");
 
+const cors = require("cors");
+
 const app = express();
 
 // Set up mongoose connection
@@ -27,6 +29,7 @@ async function main() {
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
