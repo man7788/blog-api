@@ -1,18 +1,27 @@
 import "./App.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Card from "./components/Card";
-import testData from "../../testData.jsx";
-
-// localStorage.setItem("overview", JSON.stringify(testData.overview));
-// localStorage.setItem("posts", JSON.stringify(testData.posts));
-// localStorage.setItem("user", JSON.stringify(testData.user));
-// localStorage.setItem("token", JSON.stringify(testData.token));
-// localStorage.setItem('diu', JSON.stringify('on99'));
-// localStorage.removeItem('secretKey');
-// localStorage.clear();
 
 const App = () => {
-  const posts = JSON.parse(localStorage.getItem("overview"));
+  const [posts, setPosts] = useState();
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState();
+
+  useEffect(() => {
+    fetch("http://localhost:3000/posts", { mode: "cors" })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error("server error");
+        }
+        return response.json();
+      })
+      .then((response) => setPosts(response))
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (error) return <p>A network error was encountered</p>;
+  if (loading) return <p>Loading...</p>;
 
   return (
     <>
