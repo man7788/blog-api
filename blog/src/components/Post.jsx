@@ -14,7 +14,7 @@ const Post = () => {
   });
   const [comments, setComments] = useState({ comment: [] });
   const [error, setError] = useState();
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(true);
   const { title, content, author, date_formatted, _id } = post;
 
   const [redirect, setRedirect] = useState(false);
@@ -39,8 +39,21 @@ const Post = () => {
     setRedirect(true);
   };
 
-  if (error) return <p>A network error was encountered</p>;
-  if (loading) return <p>Loading...</p>;
+  if (error) {
+    return (
+      <div>
+        <h1>Post</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>Post</h1> <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
