@@ -20,12 +20,11 @@ const App = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (error) return <p>A network error was encountered</p>;
-  if (loading) return <p>Loading...</p>;
-
   return (
     <>
       <h1>Blog</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p>A network error was encountered</p>}
       {posts ? (
         posts.map((post) => <Card key={post._id} {...post} />)
       ) : (
