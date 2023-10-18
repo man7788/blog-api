@@ -57,7 +57,6 @@ exports.create_comment = [
 
     if (!errors.isEmpty()) {
       res.json({
-        comment,
         errors: errors.array(),
       });
     } else {
