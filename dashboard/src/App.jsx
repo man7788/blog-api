@@ -1,51 +1,73 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import testData from '../../testData.jsx';
-
-// localStorage.setItem('overview', JSON.stringify(testData.overview));
-// localStorage.setItem('posts', JSON.stringify(testData.posts));
-// localStorage.setItem('user', JSON.stringify(testData.user));
-// localStorage.setItem('token', JSON.stringify(testData.token));
-// localStorage.setItem('diu', JSON.stringify('on99'));
-// localStorage.removeItem('secretKey');
-// localStorage.clear();
 
 const App = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [login, setLogin] = useState(false);
-  const [error, setError] = useState('');
 
-  // Delete after API implementation
-  const [user, setUser] = useState('');
+  const [serverError, setServerError] = useState(false);
+  const [formErrors, setFormErrors] = useState([]);
 
-  // Delete after API implementation
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    userData && setUser(userData);
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const [redirect, setRedirect] = useState(false);
 
   const onSubmitForm = (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    // const token = <API call with form data here>
-    // if (token) {
-    // localStorage.setItem('token', JSON.stringify(token));
-    // setLogin(true);
-    // }
-    if (username === user.username && password === user.password) {
-      // localStorage.setItem('token', JSON.stringify(token));
-      setLogin(true);
-      console.log('login');
-    } else {
-      setError('Wrong username or password.');
-    }
+    const newSignIn = { username, password };
+
+    fetch(`http://localhost:3000/user/log-in`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newSignIn),
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.errors) {
+          setFormErrors(response.errors);
+          throw new Error('login error');
+        }
+        console.log('Success:', response);
+        localStorage.setItem('token', JSON.stringify(response.token));
+        setRedirect(true);
+      })
+      .catch((error) => {
+        if (error && error.message !== 'login error') {
+          setServerError(error);
+        }
+        console.error(error);
+      })
+      .finally(() => setLoading(false));
   };
 
+  if (serverError) {
+    return (
+      <div>
+        <h1>Login</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>Login</h1> <p>Loading...</p>
+      </div>
+    );
+  }
   return (
     <>
-      <h1>Dashboard</h1>
+      <h1>Login</h1>
       <form action="" method="post" onSubmit={onSubmitForm}>
         <label htmlFor="name">Username:</label>
         <input
@@ -61,12 +83,16 @@ const App = () => {
           id="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}></input>
-        <button type="submit">Submit</button>
+        <button type="submit">Sign in</button>
       </form>
-      {error.length > 0 && error}
-      {login === true && (
-        <Navigate to="dashboard" replace={true} state={{ login }} />
-      )}
+      {formErrors ? (
+        <ul>
+          {formErrors.map((error) => (
+            <li key={error.msg}>{error.msg}</li>
+          ))}
+        </ul>
+      ) : null}
+      {redirect && <Navigate to={'/dashboard'} />}
     </>
   );
 };
