@@ -4,31 +4,98 @@ import { Link, useLocation, Navigate } from 'react-router-dom';
 const NewPost = () => {
   const [auth, setAuth] = useState(false);
   const [redirect, setRedirect] = useState(false);
-  // state={login, post, comments} redirect from Post.jsx
-  const { state } = useLocation();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
   const [publish, setPublish] = useState(false);
 
+  const [serverError, setServerError] = useState(false);
+  const [formErrors, setFormErrors] = useState([]);
+
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    if (state && state.login === true) {
-      setAuth(true);
-    }
+    const token = JSON.parse(localStorage.getItem('token'));
+    fetch('http://localhost:3000/user/auth', {
+      mode: 'cors',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.status === true) {
+          setAuth(true);
+        }
+      })
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
   }, []);
 
   const onSubmitForm = (e) => {
     e.preventDefault();
-
-    // const postData = JSON.parse(localStorage.getItem('posts'));
+    setLoading(true);
 
     const newPost = { title, content, publish };
     console.log(newPost);
 
-    // localStorage.setItem('posts', JSON.stringify(newPost));
-    setRedirect(true);
+    const token = JSON.parse(localStorage.getItem('token'));
+
+    fetch(`http://localhost:3000/user/posts/create`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(newPost),
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.errors) {
+          setFormErrors(response.errors);
+          throw new Error('form validation error');
+        }
+        console.log('Success:', response);
+
+        setRedirect(true);
+      })
+      .catch((error) => {
+        if (error && error.message !== 'form validation error') {
+          setServerError(error);
+        }
+        console.error(error);
+      })
+      .finally(() => setLoading(false));
   };
+
+  if (serverError) {
+    return (
+      <div>
+        <h1>New Post</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>New Post</h1> <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -75,17 +142,15 @@ const NewPost = () => {
             </select>
             <button type="submit">Submit</button>
           </form>
-          <Link to={'/dashboard'} state={{ login: state.login }}>
-            Cancel
-          </Link>
-          {redirect && (
-            <Navigate
-              to={'/dashboard'}
-              state={{
-                login: state.login,
-              }}
-            />
-          )}
+          {formErrors ? (
+            <ul>
+              {formErrors.map((error) => (
+                <li key={error.msg}>{error.msg}</li>
+              ))}
+            </ul>
+          ) : null}
+          <Link to={'/dashboard'}>Cancel</Link>
+          {redirect && <Navigate to={'/dashboard'} />}
         </div>
       ) : (
         <div>
