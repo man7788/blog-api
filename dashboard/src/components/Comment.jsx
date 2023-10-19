@@ -5,8 +5,7 @@ const Comment = ({ props }) => {
   const [editComment, setEditComment] = useState(false);
   const [deleteComment, setDeleteComment] = useState(false);
 
-  const { login } = props;
-  const { comment, author, date_formatted, url } = props.comment;
+  const { comment, author, date_formatted, url, _id, post } = props;
 
   return (
     <div style={{ border: '2px solid white' }}>
@@ -18,13 +17,13 @@ const Comment = ({ props }) => {
       {editComment && (
         <Navigate
           to={'/user' + url + '/edit'}
-          state={{ login, comment: props.comment }}
+          state={{ comment, author, _id, post }}
         />
       )}
       {deleteComment && (
         <Navigate
           to={'/user' + url + '/delete'}
-          state={{ login, comment: props.comment }}
+          state={{ comment, author, _id, post }}
         />
       )}
     </div>
