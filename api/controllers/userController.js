@@ -101,6 +101,19 @@ exports.login_b = [
   }),
 ];
 
+// Handle authorization check on GET
+exports.auth = asyncHandler(async (req, res, next) => {
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        status: true,
+      });
+    }
+  });
+});
+
 // Display all post on GET.
 exports.posts = asyncHandler(async (req, res, next) => {
   const posts = await Post.find().populate({

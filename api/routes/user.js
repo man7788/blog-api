@@ -10,6 +10,9 @@ router.post("/sign-up", userController.sign_up_b);
 // POST request log-in user
 router.post("/log-in", userController.login_b);
 
+// GET request to check authorization (Protected)
+router.get("/auth", verifyToken, userController.auth);
+
 // GET request to display detail of all blog posts (Protected)
 router.get("/posts", verifyToken, userController.posts);
 
