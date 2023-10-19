@@ -188,7 +188,6 @@ exports.post_create = [
     if (!errors.isEmpty()) {
       // There are errors. Render form again with sanitized values/error messages.
       res.json({
-        post,
         errors: errors.array(),
       });
     } else {
