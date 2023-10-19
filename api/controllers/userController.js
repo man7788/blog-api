@@ -103,7 +103,11 @@ exports.login_b = [
 
 // Display all post on GET.
 exports.posts = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find();
+  const posts = await Post.find().populate({
+    path: "author",
+    model: "User",
+    select: "username",
+  });
 
   jwt.verify(req.token, "secretkey", (err, authData) => {
     if (err) {
