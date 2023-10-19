@@ -75,10 +75,7 @@ const Post = () => {
         </div>
       )}
       {editPost && (
-        <Navigate
-          to={'/user/posts/' + post._id + '/edit'}
-          state={{ post, comments }}
-        />
+        <Navigate to={'/user/posts/' + post._id + '/edit'} state={{ post }} />
       )}
       {deletePost && (
         <Navigate to={'/user/posts/' + post._id + '/delete'} state={{ post }} />
