@@ -6,25 +6,50 @@ const Dashboard = () => {
   const [auth, setAuth] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const [posts, setPosts] = useState();
-  // state={login} redirect from App.jsx
-  const { state } = useLocation();
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (state && state.login === true) {
-      setAuth(true);
-      // const checkToken = JSON.parse(localStorage.getItem('token'));
-      // const postData = <API call with token header>
-      const postData = JSON.parse(localStorage.getItem('overview'));
-      if (postData) {
-        setPosts(postData);
-      }
-    }
+    const token = JSON.parse(localStorage.getItem('token'));
+    fetch('http://localhost:3000/user/posts', {
+      mode: 'cors',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        setPosts(response.posts);
+        setAuth(true);
+      })
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
   }, []);
 
   const onNewPost = () => {
     setRedirect(true);
   };
 
+  if (error) {
+    return (
+      <div>
+        <h1>Dashboard</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>Dashboard</h1> <p>Loading...</p>
+      </div>
+    );
+  }
   return (
     <>
       {auth ? (
@@ -32,7 +57,7 @@ const Dashboard = () => {
           <h1>Dashboard</h1>
           <p>Welcome back!</p>
           {posts ? (
-            posts.map((post) => <Card key={post._id} {...post} state={state} />)
+            posts.map((post) => <Card key={post._id} {...post} />)
           ) : (
             <p>No post to show</p>
           )}
