@@ -5,40 +5,83 @@ const CommentDelete = () => {
   const [auth, setAuth] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const [cancel, setCancel] = useState(false);
-  // state={login, props.comment} redirect from Comment.jsx
+  // state={...} redirect from Comment.jsx
   const { state } = useLocation();
-  const { login } = state;
-  const { comment, _id, post } = state.comment;
+  const { comment, _id, post } = state;
+
+  const [serverError, setServerError] = useState(false);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (state && login === true) {
-      setAuth(true);
-    }
+    const token = JSON.parse(localStorage.getItem('token'));
+    fetch('http://localhost:3000/user/auth', {
+      mode: 'cors',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.status === true) {
+          setAuth(true);
+        }
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   }, []);
 
   const onDeletePost = () => {
-    const postData = JSON.parse(localStorage.getItem('posts'));
+    const token = JSON.parse(localStorage.getItem('token'));
 
-    const newPostData = postData.map((post) => {
-      const newCommentData = post.comments.filter((comment) => {
-        if (comment._id !== _id) {
-          return comment;
+    fetch(`http://localhost:3000/user/comments/${_id}/delete`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
         }
+        setRedirect(true);
+        return response.json();
+      })
+      .catch((error) => {
+        if (error && error.message !== 'form validation error') {
+          setServerError(error);
+        }
+        console.error(error);
       });
-
-      post.comments = newCommentData;
-      return post;
-    });
-    console.log(newPostData);
-    localStorage.setItem('posts', JSON.stringify(newPostData));
-    setRedirect(true);
   };
+
+  if (serverError) {
+    return (
+      <div>
+        <h1>Delete Post</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>Delete Post</h1> <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <>
       {auth ? (
         <div>
-          <h3>Are you sure want to delete &quot;{comment}&quot;?</h3>
+          <h3>Are you sure want to delete comment &quot;{comment}&quot;?</h3>
           <button onClick={() => setCancel(true)}>Cancel</button>{' '}
           <button onClick={onDeletePost}>Delete</button>
           {cancel && (
