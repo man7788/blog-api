@@ -7,24 +7,75 @@ const PostDelete = () => {
   const [cancel, setCancel] = useState(false);
   // state={login, post} redirect from Post.jsx
   const { state } = useLocation();
+  const { _id } = state.post;
+
+  const [serverError, setServerError] = useState(false);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (state && state.login === true) {
-      setAuth(true);
-    }
+    const token = JSON.parse(localStorage.getItem('token'));
+    fetch('http://localhost:3000/user/auth', {
+      mode: 'cors',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.status === true) {
+          setAuth(true);
+        }
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   }, []);
 
   const onDeletePost = () => {
-    const postData = JSON.parse(localStorage.getItem('posts'));
-    const newPostData = postData.filter((post) => {
-      if (post.post._id !== state.post._id) {
-        return post;
-      }
-    });
-    console.log(newPostData);
-    localStorage.setItem('posts', JSON.stringify(newPostData));
-    setRedirect(true);
+    const token = JSON.parse(localStorage.getItem('token'));
+
+    fetch(`http://localhost:3000/user/posts/${_id}/delete`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        setRedirect(true);
+        return response.json();
+      })
+      .catch((error) => {
+        if (error && error.message !== 'form validation error') {
+          setServerError(error);
+        }
+        console.error(error);
+      });
   };
+
+  if (serverError) {
+    return (
+      <div>
+        <h1>Delete Post</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>Delete Post</h1> <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -39,9 +90,7 @@ const PostDelete = () => {
               state={{ login: state.login }}
             />
           )}
-          {redirect && (
-            <Navigate to={'/dashboard'} state={{ login: state.login }} />
-          )}
+          {redirect && <Navigate to={'/dashboard'} />}
         </div>
       ) : (
         <div>
