@@ -68,7 +68,7 @@ exports.login_b = [
     .escape(),
   body("password", "Password must not be empty.")
     .trim()
-    .isLength({ min: 8 })
+    .isLength({ min: 1 })
     .escape(),
 
   asyncHandler(async (req, res, next) => {
@@ -82,11 +82,15 @@ exports.login_b = [
     } else {
       const user = await User.findOne({ username: req.body.username });
       if (!user) {
-        throw new Error("User Not Found.");
+        res.json({
+          errors: [{ msg: "User Not Found." }],
+        });
       }
       const match = await bcrypt.compare(req.body.password, user.password);
       if (!match) {
-        throw new Error("Incorrect Password.");
+        res.json({
+          errors: [{ msg: "Incorrect Password." }],
+        });
       }
       jwt.sign({ user }, "secretkey", (err, token) => {
         res.json({
