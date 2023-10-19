@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, Link, Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Card from './Card';
 
 const Dashboard = () => {

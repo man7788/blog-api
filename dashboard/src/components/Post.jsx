@@ -1,5 +1,5 @@
 import Comment from './Comment';
-import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
+import { Link, useParams, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 const Post = () => {

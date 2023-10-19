@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 const NewPost = () => {
   const [auth, setAuth] = useState(false);
@@ -13,7 +13,6 @@ const NewPost = () => {
   const [serverError, setServerError] = useState(false);
   const [formErrors, setFormErrors] = useState([]);
 
-  const [error, setError] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
