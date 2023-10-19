@@ -4,17 +4,36 @@ import { Link, useLocation, Navigate } from 'react-router-dom';
 const CommentEdit = () => {
   const [auth, setAuth] = useState(false);
   const [redirect, setRedirect] = useState(false);
-  // state={login, props.comment} redirect from Comment.jsx
+  // state={comment, post} redirect from Comment.jsx
   const { state } = useLocation();
-  const { login } = state;
-  const { comment, author, _id, post } = state.comment;
+  const { comment, author, _id, post } = state;
 
-  const originalComment = state.comment;
+  const [serverError, setServerError] = useState(false);
+  const [formErrors, setFormErrors] = useState([]);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (state && login === true) {
-      setAuth(true);
-    }
+    const token = JSON.parse(localStorage.getItem('token'));
+    fetch('http://localhost:3000/user/auth', {
+      mode: 'cors',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.status === true) {
+          setAuth(true);
+        }
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   }, []);
 
   const [editComment, setEditComment] = useState(comment);
@@ -22,29 +41,63 @@ const CommentEdit = () => {
 
   const onSubmitForm = (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const updatedComment = {
-      ...originalComment,
       comment: editComment,
       author: editAuthor,
     };
 
-    const postData = JSON.parse(localStorage.getItem('posts'));
+    const token = JSON.parse(localStorage.getItem('token'));
 
-    const newPostData = postData.map((post) => {
-      const newCommentData = post.comments.map((comment) => {
-        if (comment._id === _id) {
-          return updatedComment;
-        } else {
-          return comment;
+    fetch(`http://localhost:3000/user/comments/${_id}/edit`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedComment),
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
         }
-      });
-      post.comments = newCommentData;
-      return post;
-    });
-    localStorage.setItem('posts', JSON.stringify(newPostData));
-    setRedirect(true);
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.errors) {
+          setFormErrors(response.errors);
+          throw new Error('form validation error');
+        }
+        console.log('Success:', response);
+
+        setRedirect(true);
+      })
+      .catch((error) => {
+        if (error && error.message !== 'form validation error') {
+          setServerError(error);
+        }
+        console.error(error);
+      })
+      .finally(() => setLoading(false));
   };
+
+  if (serverError) {
+    return (
+      <div>
+        <h1>New Post</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>New Post</h1> <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -72,14 +125,15 @@ const CommentEdit = () => {
               onChange={(event) => setEditAuthor(event.target.value)}></input>
             <button type="submit">Submit</button>
           </form>
-          {redirect && (
-            <Navigate
-              to={'/user/posts/' + post}
-              state={{
-                login: state.login,
-              }}
-            />
-          )}
+          {formErrors ? (
+            <ul>
+              {formErrors.map((error) => (
+                <li key={error.msg}>{error.msg}</li>
+              ))}
+            </ul>
+          ) : null}
+          <Link to={'/user/posts/' + post}>Cancel</Link>
+          {redirect && <Navigate to={'/user/posts/' + post} />}
         </div>
       ) : (
         <div>
@@ -87,9 +141,6 @@ const CommentEdit = () => {
           <Link to="/">Back to homepage</Link>
         </div>
       )}
-      <Link to={'/user/posts/' + post} state={{ login: state.login }}>
-        Cancel
-      </Link>
     </>
   );
 };
