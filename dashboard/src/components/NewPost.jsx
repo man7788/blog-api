@@ -35,7 +35,7 @@ const NewPost = () => {
           setAuth(true);
         }
       })
-      .catch((error) => setError(error))
+      .catch((error) => console.error(error))
       .finally(() => setLoading(false));
   }, []);
 
