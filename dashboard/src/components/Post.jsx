@@ -64,7 +64,7 @@ const Post = () => {
           <button onClick={() => setDeletePost(true)}>Delete</button>
           <h3>Comment</h3>
           {comments.map((comment) => (
-            <Comment key={comment._id} props={{ comment }} />
+            <Comment key={comment._id} props={{ ...comment }} />
           ))}
           <Link to="/dashboard">Back to dashboard</Link>
         </div>
