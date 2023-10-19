@@ -2,38 +2,55 @@ import Comment from './Comment';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-const query = (id, posts) => {
-  for (const post of posts) {
-    if (post.post._id === id) {
-      return post;
-    }
-  }
-};
-
 const Post = () => {
+  const { postId } = useParams();
   const [auth, setAuth] = useState(false);
   const [post, setPost] = useState();
   const [comments, setComments] = useState();
-  // state={login} redirect from Card.jsx
-  const { state } = useLocation();
-  const { postId } = useParams();
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (state && state.login === true) {
-      setAuth(true);
-      // const checkToken = JSON.parse(localStorage.getItem('token'));
-      // const postData = <API call with token header>
-      const postData = JSON.parse(localStorage.getItem('posts'));
-      if (postData) {
-        const postDetail = query(postId, postData);
-        setPost(postDetail.post);
-        setComments(postDetail.comments);
-      }
-    }
+    const token = JSON.parse(localStorage.getItem('token'));
+    fetch(`http://localhost:3000/user/posts/${postId}`, {
+      mode: 'cors',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        setPost(response.post);
+        setComments(response.comments);
+        setAuth(true);
+      })
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
   }, []);
 
   const [editPost, setEditPost] = useState(false);
   const [deletePost, setDeletePost] = useState(false);
+
+  if (error) {
+    return (
+      <div>
+        <h1>Post</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>Post</h1> <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -47,14 +64,9 @@ const Post = () => {
           <button onClick={() => setDeletePost(true)}>Delete</button>
           <h3>Comment</h3>
           {comments.map((comment) => (
-            <Comment
-              key={comment._id}
-              props={{ comment, login: state.login }}
-            />
+            <Comment key={comment._id} props={{ comment }} />
           ))}
-          <Link to="/dashboard" state={state}>
-            Back to dashboard
-          </Link>
+          <Link to="/dashboard">Back to dashboard</Link>
         </div>
       ) : (
         <div>
@@ -65,14 +77,11 @@ const Post = () => {
       {editPost && (
         <Navigate
           to={'/user/posts/' + post._id + '/edit'}
-          state={{ login: state.login, post, comments }}
+          state={{ post, comments }}
         />
       )}
       {deletePost && (
-        <Navigate
-          to={'/user/posts/' + post._id + '/delete'}
-          state={{ login: state.login, post }}
-        />
+        <Navigate to={'/user/posts/' + post._id + '/delete'} state={{ post }} />
       )}
     </div>
   );
