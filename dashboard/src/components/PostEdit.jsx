@@ -4,7 +4,7 @@ import { Link, useLocation, Navigate } from 'react-router-dom';
 const PostEdit = () => {
   const [auth, setAuth] = useState(false);
   const [redirect, setRedirect] = useState(false);
-  // state={login, post, comments} redirect from Post.jsx
+  // state={post} redirect from Post.jsx
   const { state } = useLocation();
   const { title, content, author, publish, _id } = state.post;
 
@@ -13,40 +13,97 @@ const PostEdit = () => {
   const [editAuthor, setEditAuthor] = useState(author.username);
   const [editPublish, setEditPublish] = useState(publish);
 
+  const [serverError, setServerError] = useState(false);
+  const [formErrors, setFormErrors] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    if (state && state.login === true) {
-      setAuth(true);
-    }
+    const token = JSON.parse(localStorage.getItem('token'));
+    fetch('http://localhost:3000/user/auth', {
+      mode: 'cors',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.status === true) {
+          setAuth(true);
+        }
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   }, []);
 
   const onSubmitForm = (e) => {
     e.preventDefault();
-
-    const comments = state.comments.length > 0 ? state.comments : [];
+    setLoading(true);
 
     const updatedPost = {
-      post: {
-        title: editTitle,
-        content: editContent,
-        author: { username: editAuthor, _id: author._id },
-        publish: editPublish,
-        _id,
-      },
-      comments,
+      title: editTitle,
+      content: editContent,
+      publish: editPublish,
+      _id,
     };
 
-    const postData = JSON.parse(localStorage.getItem('posts'));
-    const newPostData = postData.map((post) => {
-      if (post.post._id === _id) {
-        return updatedPost;
-      } else {
-        return post;
-      }
-    });
-    // console.log(newPostData);
-    localStorage.setItem('posts', JSON.stringify(newPostData));
-    setRedirect(true);
+    const token = JSON.parse(localStorage.getItem('token'));
+
+    fetch(`http://localhost:3000/user/posts/${_id}/edit`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedPost),
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('server error');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        if (response && response.errors) {
+          setFormErrors(response.errors);
+          throw new Error('form validation error');
+        }
+        console.log('Success:', response);
+
+        setRedirect(true);
+      })
+      .catch((error) => {
+        if (error && error.message !== 'form validation error') {
+          setServerError(error);
+        }
+        console.error(error);
+      })
+      .finally(() => setLoading(false));
+
+    console.log(updatedPost);
   };
+
+  if (serverError) {
+    return (
+      <div>
+        <h1>New Post</h1> <p>A network error was encountered</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h1>New Post</h1> <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -84,25 +141,21 @@ const PostEdit = () => {
               defaultValue={publish === true ? true : false}
               name="publish"
               id="publish"
-              onChange={(event) =>
-                setEditPublish(event.target.value ? true : false)
-              }>
+              onChange={(event) => setEditPublish(event.target.value)}>
               <option value="true">Yes</option>
               <option value="false">No</option>
             </select>
             <button type="submit">Submit</button>
           </form>
-          <Link to={'/user/posts/' + _id} state={{ login: state.login }}>
-            Cancel
-          </Link>
-          {redirect && (
-            <Navigate
-              to={'/user/posts/' + _id}
-              state={{
-                login: state.login,
-              }}
-            />
-          )}
+          {formErrors ? (
+            <ul>
+              {formErrors.map((error) => (
+                <li key={error.msg}>{error.msg}</li>
+              ))}
+            </ul>
+          ) : null}
+          <Link to={'/user/posts/' + _id}>Cancel</Link>
+          {redirect && <Navigate to={'/user/posts/' + _id} />}
         </div>
       ) : (
         <div>
