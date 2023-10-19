@@ -62,7 +62,7 @@ const Dashboard = () => {
             <p>No post to show</p>
           )}
           <button onClick={onNewPost}>New Post</button>
-          {redirect && <Navigate to={'/new-post/'} state={{ login: true }} />}
+          {redirect && <Navigate to={'/new-post'} />}
         </>
       ) : (
         <div>
